@@ -10,7 +10,7 @@ class Ant():
 
     def build_solution(self, graph, rng):
         solution = {
-            'path': [self.start_vertex],
+            'path': [ self.start_vertex ],
             'cost': 0
         }
 
@@ -21,7 +21,7 @@ class Ant():
 
         while(cur_vertex != self.end_vertex):
             possible_paths = []
-            for index, vertex in enumerate(graph[cur_vertex]):
+            for key, vertex in graph[cur_vertex].items():
                 if vertex.v not in visited_vertex:
                     possible_paths.append( vertex )
 
@@ -48,8 +48,6 @@ class Ant():
         if (cur_vertex != self.end_vertex):
             print('Warning: Ant did not reach end')
             print('Solution:', solution)
-        
-        print(solution)
-        input()
+            solution = None
 
         return solution

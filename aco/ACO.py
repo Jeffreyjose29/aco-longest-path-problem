@@ -18,14 +18,24 @@ class ACO():
         # Best Solution
         self.best_solution = {
             'path': [],
-            'cost': []
+            'cost': -1
         }
+
+    def _update_phoromoe_trail(self, graph):
+        best_solution = self.best_solution
 
     def run(self):
         for iteration in range(self.max_iterations):
             for ant in self.ants:
-                ant.build_solution(self.graph, self.rng)
-                # Get Cost
-                # Update Update Best Solution
+                solution = ant.build_solution(self.graph, self.rng)
+                
+                # If it is a valid solution
+                if (solution):
+                    if (solution['cost'] > self.best_solution['cost']):
+                        self.best_solution = solution
+
 
             # Update pheromone trail
+            self._update_phoromoe_trail(self.graph)
+        
+        print(self.best_solution)
