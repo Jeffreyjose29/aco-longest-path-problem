@@ -7,9 +7,9 @@ class Node:
         self.w = w
         self.pheromone = 0
 
-    # def __str__(self):
-    #     return 'Node {} with weight {} and pheromone {}'.format(self.v,
-    #         self.w, self.pheromone)
+    def __str__(self):
+        return 'Node {} with weight {} and pheromone {}'.format(self.v,
+            self.w, self.pheromone)
 
 def build_graph_from_file(graph_path, nb_vertex):
     if not os.path.exists(graph_path):
@@ -23,11 +23,11 @@ def build_graph_from_file(graph_path, nb_vertex):
             y = int(y) - 1
             graph[x][y] = Node(y, int(z))
 
-    # for i in range(len(graph)):
-    #     print('Vertex {}'.format(i))
-    #     for node in graph[i]:
-    #         print(node)
-    #     print()
-
     return graph
 
+def print_graph(graph):
+    for i in range(len(graph)):
+        print('Vertex {}'.format(i))
+        for key, node in graph[i].items():
+            print(node)
+    print()

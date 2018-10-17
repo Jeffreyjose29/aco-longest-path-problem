@@ -17,7 +17,7 @@ if __name__ == '__main__':
                         help='Number of runs to calculate mean and std')
     parser.add_argument('--ants', '-a', type=int, default=20,
                         help='Number of ants')
-    parser.add_argument('--iterations', '-i', type=int, default=20)
+    parser.add_argument('--iterations', '-i', type=int, default=50)
     parser.add_argument('--evaporation', '-e', type=float, default=0.1)
     parser.add_argument('--init-pheromone', type=float, default=0.1)
     parser.add_argument('--alpha', type=float, default=1)
@@ -49,5 +49,5 @@ if __name__ == '__main__':
     for i in range(0, args.runs):
         new_rng = np.random.RandomState(seed=run_seeds[i])
         aco = ACO(graph, args.iterations, args.ants, args.init_pheromone,
-            args.alpha, args.beta, new_rng)
+            args.evaporation, args.alpha, args.beta, new_rng)
         aco.run()
