@@ -33,8 +33,10 @@ class Ant():
             if ( np.sum(possible_paths) == 0 ):
                 break
             
-            probs = np.power(pheromone[cur_vertex,:] * visited_vertex, self.alpha) + np.power(possible_paths, self.beta)
-            probs /= np.sum(probs)
+            p = np.power(pheromone[cur_vertex,:] * visited_vertex, self.alpha)
+            w = np.power(possible_paths, self.beta)
+            probs = p * w
+            probs /= np.dot(p,w)
 
             # print(probs)
             # input('stop point')

@@ -8,14 +8,6 @@ from aco.graph.Node import print_graph
 import matplotlib.pyplot as plt
 import networkx as nx
 
-def show_graph_with_labels(adjacency_matrix):
-    rows, cols = np.where(adjacency_matrix == 1)
-    edges = zip(rows.tolist(), cols.tolist())
-    gr = nx.Graph()
-    gr.add_edges_from(edges)
-    nx.draw(gr, node_size=500, with_labels=True)
-    plt.show()
-
 class ACO():
     def __init__(self, graph, identity, max_iterations, nb_ants, init_pheromone, evaporation, alpha, beta, rng):
         self.graph = copy.copy(graph)
@@ -59,10 +51,10 @@ class ACO():
 
         ants = sorted(ants, key=lambda x: x.latest_solution['cost'] if (x.latest_solution) else -1, reverse=True)
         
-        k = 20
+        k = 15
         for count, ant in enumerate(ants):
-            # if(count+1 == k):
-            #     break
+            if(count+1 == k):
+                break
 
             solution = ant.latest_solution
             # path_vector = np.zeros(graph.shape[0])
@@ -73,10 +65,10 @@ class ACO():
 
             if (solution):
                 for i in range (0, len(solution['path'])-1):
-                    self.pheromone[solution['path'][i]][solution['path'][i+1]] += self.evaporation * (1.0 - (1.0/solution['cost']))
+                    self.pheromone[solution['path'][i]][solution['path'][i+1]] += (1.0 - (1.0/solution['cost']))
         
-        for i in range (0, len(best_solution['path'])-1):
-            self.pheromone[best_solution['path'][i]][best_solution['path'][i+1]] += self.evaporation * (1.0 - (1.0/best_solution['cost']))
+        # for i in range (0, len(best_solution['path'])-1):
+        #     self.pheromone[best_solution['path'][i]][best_solution['path'][i+1]] += self.evaporation * (1.0 - (1.0/best_solution['cost']))
 
         # G = nx.from_numpy_matrix(self.pheromone, create_using=nx.MultiGraph)
 
@@ -91,22 +83,22 @@ class ACO():
 
     def run(self):
         
-        solutions = {}
+        all_solutions = {}
 
         for iteration in range(self.max_iterations):
-            solutions['Iteration ' + str(iteration)] = {
+            all_solutions['Iteration ' + str(iteration)] = {
                 'costs': []
             }
 
             start = time.time()
             for ant in self.ants:
-                solution = ant.build_solution(self.graph, self.pheromone, self.rng, iteration)
+                current_solution = ant.build_solution(self.graph, self.pheromone, self.rng, iteration)
                 
                 # If it is a valid solution
-                if (solution):
-                    solutions['Iteration ' + str(iteration)]['costs'].append(solution['cost'])
-                    if (solution['cost'] > self.best_solution['cost']):
-                        self.best_solution = solution
+                if (current_solution):
+                    all_solutions['Iteration ' + str(iteration)]['costs'].append(current_solution['cost'])
+                    if (current_solution['cost'] > self.best_solution['cost']):
+                        self.best_solution = current_solution
             # print('took ants seconds', time.time()-start)
 
             # Update pheromone trail
@@ -117,7 +109,9 @@ class ACO():
             # print(iteration)
             if (iteration % 100 == 0):
                 print('Iteration {} - Best Cost: {} - Mean/Std: {} +- {}'.format(iteration, 
-                    self.best_solution['cost'], np.mean(solutions['Iteration ' + str(iteration)]['costs']),
-                    np.std(solutions['Iteration ' + str(iteration)]['costs'])))
+                    self.best_solution['cost'], np.mean(all_solutions['Iteration ' + str(iteration)]['costs']),
+                    np.std(all_solutions['Iteration ' + str(iteration)]['costs'])))
 
-        print(self.best_solution['cost'])
+        print(self.best_solution)
+        # input()
+        return all_solutions, self.best_solution 

@@ -1,11 +1,21 @@
-import argparse, time, os
+import argparse, time, os, json, copy
 
 import numpy as np
+import multiprocessing as mp
 
 from aco.ACO import ACO
 from aco.graph.Node import build_graph_from_file
 
 np.set_printoptions(suppress=True)
+
+def aco_run(runs_solutions, runs_best_solutions, graph, identity, args, seed):
+    rng = np.random.RandomState(seed=seed)
+    aco = ACO(graph, identity, args.iterations, args.ants, args.init_pheromone,
+            args.evaporation, args.alpha, args.beta, rng)
+    solutions, best_solution = aco.run()
+
+    runs_solutions.append(solutions)
+    runs_best_solutions.append(best_solution)
 
 if __name__ == '__main__':
     # Argument Parser
@@ -48,8 +58,58 @@ if __name__ == '__main__':
     rgenerator = np.random.RandomState(seed=args.random_seed)
     run_seeds = rgenerator.randint(0, 1000000000, args.runs)
 
-    for i in range(0, args.runs):
-        new_rng = np.random.RandomState(seed=run_seeds[i])
-        aco = ACO(graph, identity, args.iterations, args.ants, args.init_pheromone,
-            args.evaporation, args.alpha, args.beta, new_rng)
-        aco.run()
+    run_solutions = {
+        'Parameters': {
+            'Iterations': args.iterations,
+            'Ants': args.ants,
+            'Initial Pheromone': args.init_pheromone,
+            'Evaporation': args.evaporation,
+            'Alpha': args.alpha,
+            'Beta': args.beta
+        },
+        'Runs': []
+    }
+    run_best_solutions = copy.deepcopy(run_solutions)
+
+    # Normal run, for debugging
+    # for i in range(0, args.runs):
+    #     new_rng = np.random.RandomState(seed=run_seeds[i])
+    #     aco = ACO(graph, identity, args.iterations, args.ants, args.init_pheromone,
+    #         args.evaporation, args.alpha, args.beta, new_rng)
+    #     solutions, best_solution = aco.run()
+
+    #     run_solutions['Runs'].append(solutions)
+    #     run_best_solutions['Runs'].append(best_solution)
+
+    # Parallel Run
+    pool = mp.Pool(args.jobs)
+    processes = []
+    with mp.Manager() as manager:
+        runs_solutions = manager.list()
+        runs_best_solutions = manager.list()
+        for i in range(0, args.runs):
+            pool.apply_async(aco_run,
+                args=(runs_solutions, runs_best_solutions, graph, identity, args, run_seeds[i]))
+        pool.close()
+        pool.join()
+        
+        run_solutions['Runs'] = list(runs_solutions)
+        run_best_solutions['Runs'] = list(runs_best_solutions)
+
+    save_file = 'it{}_ant{}_ipher{}_evap{}_alph{}_bet{}'.format(
+        args.iterations,
+        args.ants,
+        args.init_pheromone,
+        args.evaporation,
+        args.alpha,
+        args.beta
+    )
+
+    save_dir = os.path.join('experiments', args.save_dir)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    with open(os.path.join(save_dir, 'sol_' + save_file + '.json'), 'w') as fhandle:
+        json.dump(run_solutions, fhandle, indent=2)
+    with open(os.path.join(save_dir, 'best_sol_' + save_file + '.json'), 'w') as fhandle:
+        json.dump(run_best_solutions, fhandle, indent=2)
