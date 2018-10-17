@@ -10,7 +10,7 @@ class Ant():
 
         self.last_solution = None
 
-    def build_solution(self, graph, rng):
+    def build_solution(self, graph, pheromone, rng, it):
         solution = {
             'path': [ self.start_vertex ],
             'cost': 0
@@ -18,34 +18,37 @@ class Ant():
 
         # Build Solution
         cur_vertex = self.start_vertex
-        visited_vertex = set()
+        
+        visited_vertex = np.ones(graph.shape[0])
+        # print(visited_vertex)
         
         while(cur_vertex != self.end_vertex):
-            visited_vertex.add(cur_vertex)
-            possible_paths = []
-            for key, vertex in graph[cur_vertex].items():
-                if vertex.v not in visited_vertex:
-                    possible_paths.append( vertex )
+            visited_vertex[cur_vertex] = 0
+
+            possible_paths = graph[cur_vertex,:] * visited_vertex
+            # print(possible_paths)
+            # input('possible_paths')
 
             # Cant go anywhere else
-            if (len(possible_paths) == 0):
+            if ( np.sum(possible_paths) == 0 ):
                 break
             
-            denominator = 0
-            for vertex in possible_paths:
-                denominator += vertex.pheromone**self.alpha + vertex.w**self.beta
-            
-            probs = []
-            for vertex in possible_paths:
-                probs.append( (vertex.pheromone**self.alpha + vertex.w**self.beta) / denominator)
-            
-            choice = rng.choice(len(possible_paths), p=probs)
-            next_vertex = possible_paths[choice]
+            probs = np.power(pheromone[cur_vertex,:] * visited_vertex, self.alpha) + np.power(possible_paths, self.beta)
+            probs /= np.sum(probs)
 
-            solution['path'].append(next_vertex.v)
-            solution['cost'] += next_vertex.w
+            # print(probs)
+            # input('stop point')
+
+            # print(probs)
+            choice = rng.choice(len(probs), p=probs)
+            # print(choice)
+            # input('choice')
+            next_vertex = choice
+
+            solution['path'].append(choice)
+            solution['cost'] += graph[cur_vertex][next_vertex]
             
-            cur_vertex = next_vertex.v
+            cur_vertex = choice
 
         if (cur_vertex != self.end_vertex):
             # print('Warning: Ant did not reach end')

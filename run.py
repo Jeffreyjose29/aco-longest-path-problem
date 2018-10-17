@@ -5,6 +5,8 @@ import numpy as np
 from aco.ACO import ACO
 from aco.graph.Node import build_graph_from_file
 
+np.set_printoptions(suppress=True)
+
 if __name__ == '__main__':
     # Argument Parser
     parser = argparse.ArgumentParser(description='ACO - Longest Path Problem')
@@ -20,8 +22,8 @@ if __name__ == '__main__':
     parser.add_argument('--iterations', '-i', type=int, default=50)
     parser.add_argument('--evaporation', '-e', type=float, default=0.1)
     parser.add_argument('--init-pheromone', type=float, default=0.1)
-    parser.add_argument('--alpha', type=float, default=1)
-    parser.add_argument('--beta', type=float, default=2)
+    parser.add_argument('--alpha', type=float, default=1.0)
+    parser.add_argument('--beta', type=float, default=1.0)
 
     # Special Arguments
     parser.add_argument('--jobs', '-j', type=int, default=6)
@@ -40,7 +42,7 @@ if __name__ == '__main__':
     elif (args.dataset == 'graph3'):
         nb_vertex = 1000
     graph_path = os.path.join('dataset', args.dataset + '.txt')
-    graph = build_graph_from_file(graph_path, nb_vertex)
+    graph, identity = build_graph_from_file(graph_path, nb_vertex)
 
     # Seeds to be used across all runs
     rgenerator = np.random.RandomState(seed=args.random_seed)
@@ -48,6 +50,6 @@ if __name__ == '__main__':
 
     for i in range(0, args.runs):
         new_rng = np.random.RandomState(seed=run_seeds[i])
-        aco = ACO(graph, args.iterations, args.ants, args.init_pheromone,
+        aco = ACO(graph, identity, args.iterations, args.ants, args.init_pheromone,
             args.evaporation, args.alpha, args.beta, new_rng)
         aco.run()
