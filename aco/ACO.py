@@ -51,9 +51,9 @@ class ACO():
 
         ants = sorted(ants, key=lambda x: x.latest_solution['cost'] if (x.latest_solution) else -1, reverse=True)
         
-        k = 15
+        k = self.nb_ants * 0.5
         for count, ant in enumerate(ants):
-            if(count+1 == k):
+            if(count+1 >= k):
                 break
 
             solution = ant.latest_solution
@@ -87,7 +87,8 @@ class ACO():
 
         for iteration in range(self.max_iterations):
             all_solutions['Iteration ' + str(iteration)] = {
-                'costs': []
+                'costs': [],
+                'best_cost': []
             }
 
             start = time.time()
@@ -100,6 +101,8 @@ class ACO():
                     if (current_solution['cost'] > self.best_solution['cost']):
                         self.best_solution = current_solution
             # print('took ants seconds', time.time()-start)
+
+            all_solutions['Iteration ' + str(iteration)]['best_cost'] = self.best_solution['cost']
 
             # Update pheromone trail
             start = time.time()

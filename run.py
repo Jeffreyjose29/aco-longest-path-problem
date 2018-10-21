@@ -39,7 +39,9 @@ if __name__ == '__main__':
     parser.add_argument('--jobs', '-j', type=int, default=6)
     parser.add_argument('--random-seed', type=int, default=481516)
     parser.add_argument('--save-dir', type=str, default=str(time.time()).split('.')[0],
-                        help='The save directory. Experiments will be saved on experiments/$SAVE_DIR')
+                        help='The save directory. Experiments will be saved on experiments/$SAVE_DIR/$SUB_DIR')
+    parser.add_argument('--sub-dir', type=str, default='all',
+                        help='The save directory. Experiments will be saved on experiments/$SAVE_DIR/$SUB_DIR')
 
     args = parser.parse_args()
     print('Running with args:', args)
@@ -67,7 +69,7 @@ if __name__ == '__main__':
             'Alpha': args.alpha,
             'Beta': args.beta
         },
-        'Runs': []
+        'Runs': [],
     }
     run_best_solutions = copy.deepcopy(run_solutions)
 
@@ -96,6 +98,17 @@ if __name__ == '__main__':
         run_solutions['Runs'] = list(runs_solutions)
         run_best_solutions['Runs'] = list(runs_best_solutions)
 
+    # Compute Mean and STD for Best solutions
+    cost_best_solutions = [ x['cost'] for x in run_best_solutions['Runs'] ]
+    max_cost = -1
+    max_cost_path = None
+    for x in run_best_solutions['Runs']:
+        if (x['cost'] > max_cost):
+            max_cost = x['cost']
+            max_cost_path = x['path']
+    stats = 'Mean Best Solution: {} +- {}\nMax Cost: {}\nPath: {}'.format(np.mean(cost_best_solutions), np.std(cost_best_solutions), max_cost, max_cost_path)
+
+    # Save Files
     save_file = 'it{}_ant{}_ipher{}_evap{}_alph{}_bet{}'.format(
         args.iterations,
         args.ants,
@@ -105,7 +118,7 @@ if __name__ == '__main__':
         args.beta
     )
 
-    save_dir = os.path.join('experiments', args.save_dir)
+    save_dir = os.path.join('experiments', args.save_dir, args.sub_dir)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
@@ -113,3 +126,7 @@ if __name__ == '__main__':
         json.dump(run_solutions, fhandle, indent=2)
     with open(os.path.join(save_dir, 'best_sol_' + save_file + '.json'), 'w') as fhandle:
         json.dump(run_best_solutions, fhandle, indent=2)
+    with open(os.path.join(save_dir, 'stats_' + save_file + '.txt'), 'w') as fhandle:
+        fhandle.write(stats)
+
+    print(os.path.join(save_dir, 'sol_' + save_file + '.json'))
