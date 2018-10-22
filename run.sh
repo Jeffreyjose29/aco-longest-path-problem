@@ -115,7 +115,7 @@ declare -a RUNS
 for nb_ants in "${arr_ants[@]}"
 do
     echo "$nb_ants ants"
-    f1=$(python3 run.py --runs $TOT_RUNS --dataset graph3 --iterations 2000 --ants $nb_ants --evaporation 0.1 --alpha 1.1 --beta 1 --save-dir $SAVEDIR --sub-dir $TEST --jobs $JOBS | tail -1)
+    f1=$(python3 run.py --runs $TOT_RUNS --dataset graph3 --iterations 4000 --ants $nb_ants --evaporation 0.1 --alpha 1.1 --beta 1 --save-dir $SAVEDIR --sub-dir $TEST --jobs $JOBS | tail -1)
     RUNS=("${RUNS[@]}" "$f1")
 done
 echo "${RUNS[@]}"
@@ -129,11 +129,11 @@ declare -a RUNS
 for evap in "${arr_ants[@]}"
 do
     echo "Evaporation = $evap"
-    f1=$(python3 run.py --runs $TOT_RUNS --dataset graph3 --iterations 2000 --ants 40 --evaporation $evap --alpha 1.1 --beta 1 --save-dir $SAVEDIR --sub-dir $TEST --jobs $JOBS | tail -1)
+    f1=$(python3 run.py --runs $TOT_RUNS --dataset graph3 --iterations 4000 --ants 40 --evaporation $evap --alpha 1.1 --beta 1 --save-dir $SAVEDIR --sub-dir $TEST --jobs $JOBS | tail -1)
     RUNS=("${RUNS[@]}" "$f1")
 done
 python3 plots/plot_fitness.py --paths "${RUNS[@]}"
 
 echo "Running best hyper"
-f1=$(python3 run.py --runs $TOT_RUNS --dataset graph3 --iterations 2000 --ants 80 --evaporation 0.05 --alpha 1.1 --beta 1 --save-dir $SAVEDIR --sub-dir best_run --jobs $JOBS | tail -1)
+f1=$(python3 run.py --runs $TOT_RUNS --dataset graph3 --iterations 4000 --ants 80 --evaporation 0.05 --alpha 1.1 --beta 1 --save-dir $SAVEDIR --sub-dir best_run --jobs $JOBS | tail -1)
 python3 plots/plot_fitness.py --paths $f1
