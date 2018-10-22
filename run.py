@@ -118,7 +118,7 @@ if __name__ == '__main__':
         args.beta
     )
 
-    save_dir = os.path.join('experiments', args.save_dir, args.sub_dir)
+    save_dir = os.path.join('experiments', args.save_dir, args.dataset, args.sub_dir)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 

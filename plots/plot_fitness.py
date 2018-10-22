@@ -140,7 +140,7 @@ for index, path in enumerate(args.paths):
 
     plt.ylim((ymin, ymax))
 
-    plt.yticks(np.arange(0, ymax, args.yticks))
+    # plt.yticks(np.arange(0, ymax, args.yticks))
 
     plt.tight_layout()
     # plt.legend()
