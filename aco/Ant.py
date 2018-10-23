@@ -1,3 +1,8 @@
+####################################
+# Name: Alexandre Maros            #
+# UFMG - Computação Natural 2018/2 #
+####################################
+
 import numpy as np
 
 class Ant():
@@ -20,14 +25,12 @@ class Ant():
         cur_vertex = self.start_vertex
         
         visited_vertex = np.ones(graph.shape[0])
-        # print(visited_vertex)
         
         while(cur_vertex != self.end_vertex):
             visited_vertex[cur_vertex] = 0
 
+            # Cant re-visit vertex
             possible_paths = graph[cur_vertex,:] * visited_vertex
-            # print(possible_paths)
-            # input('possible_paths')
 
             # Cant go anywhere else
             if ( np.sum(possible_paths) == 0 ):
@@ -38,13 +41,9 @@ class Ant():
             probs = p * w
             probs /= np.dot(p,w)
 
-            # print(probs)
-            # input('stop point')
-
-            # print(probs)
+            # Which vertex to go next
             choice = rng.choice(len(probs), p=probs)
-            # print(choice)
-            # input('choice')
+
             next_vertex = choice
 
             solution['path'].append(choice)
